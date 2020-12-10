@@ -1,0 +1,42 @@
+Model: "sequential"
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #
+=================================================================
+rescaling (Rescaling)        (None, 28, 28, 3)         0
+_________________________________________________________________
+vision_transformer (VisionTr (None, 64)                140416
+_________________________________________________________________
+dense_25 (Dense)             (None, 128)               8320
+_________________________________________________________________
+dropout_16 (Dropout)         (None, 128)               0
+_________________________________________________________________
+dense_26 (Dense)             (None, 784)               101136
+=================================================================
+Total params: 249,872
+Trainable params: 249,872
+Non-trainable params: 0
+_________________________________________________________________
+
+
+
+
+
+  inputs, attrs, num_outputs)
+tensorflow.python.framework.errors_impl.InvalidArgumentError: 3 root error(s) found.
+  (0) Invalid argument:  Incompatible shapes: [16,28,28] vs. [16]
+	 [[node Equal (defined at opt/anaconda_pkgs/anaconda/envs/tensorflow_gpu_2/lib/python3.7/threading.py:926) ]]
+	 [[div_no_nan/ReadVariableOp_3/_434]]
+  (1) Invalid argument:  Incompatible shapes: [16,28,28] vs. [16]
+	 [[node Equal (defined at opt/anaconda_pkgs/anaconda/envs/tensorflow_gpu_2/lib/python3.7/threading.py:926) ]]
+	 [[GroupCrossDeviceControlEdges_0/AdamW/AdamW/update_1_1/Const/_441]]
+  (2) Invalid argument:  Incompatible shapes: [16,28,28] vs. [16]
+	 [[node Equal (defined at opt/anaconda_pkgs/anaconda/envs/tensorflow_gpu_2/lib/python3.7/threading.py:926) ]]
+0 successful operations.
+0 derived errors ignored. [Op:__inference_train_function_20072]
+
+Function call stack:
+train_function -> train_function -> train_function
+
+python-BaseException
+^C
+Process finished with exit code 1

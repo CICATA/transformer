@@ -1,14 +1,11 @@
 # https://github.com/emla2805/vision-transformer
-
 import tensorflow as tf
 import tensorflow_addons as tfa
-
 from tensorflow.keras.layers import (
     Dense,
     Dropout,
     LayerNormalization,
 )
-
 from tensorflow.keras.layers.experimental.preprocessing import Rescaling
 
 
@@ -128,6 +125,7 @@ class VisionTransformer(tf.keras.Model):
 
     def extract_patches(self, images):
         batch_size = tf.shape(images)[0]
+
         patches = tf.image.extract_patches(
             images=images,
             sizes=[1, self.patch_size, self.patch_size, 1],
@@ -139,9 +137,11 @@ class VisionTransformer(tf.keras.Model):
         return patches
 
     def call(self, x, training):
+
         batch_size = tf.shape(x)[0]
         # x = self.rescale(x)
         patches = self.extract_patches(x)
+
         x = self.patch_proj(patches)
 
         class_emb = tf.broadcast_to(
@@ -155,6 +155,7 @@ class VisionTransformer(tf.keras.Model):
 
         # First (class token) is used for classification
         x = self.layerNorm(x[:, 0])
+
         return x
 
     def add(self, x):
