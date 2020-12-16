@@ -8,6 +8,8 @@ from matplotlib import pyplot as plt
 from tensorflow.keras.layers.experimental.preprocessing import Rescaling
 import imtools as imt
 import attention as att
+import math
+
 
 from tensorflow.keras.layers import (
     Dense,
@@ -15,7 +17,7 @@ from tensorflow.keras.layers import (
     Input
 )
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "0, 1, 3"
+os.environ["CUDA_VISIBLE_DEVICES"] = "0, 1, 2"
 AUTOTUNE = tf.data.experimental.AUTOTUNE
 
 if __name__ == "__main__":
@@ -35,14 +37,12 @@ if __name__ == "__main__":
 
     # Custom dataset
 
-    batch_size = 32
-
     # Fiting dataset
     x = imt.load_dataset('/data/gee/SAR/transformer/data/train/c2', args.image_size, args.image_size)
-    # y = imt.load_dataset('/data/gee/SAR/transformer/data/train/c2', args.image_size, args.image_size)
+    y = imt.load_dataset('/data/gee/SAR/transformer/data/train/c2', args.patch_size, args.patch_size)
 
-    train_dataset = tf.data.Dataset.from_tensor_slices((x, x))
-    train_dataset = train_dataset.shuffle(10).batch(batch_size).prefetch(AUTOTUNE).cache()
+    train_dataset = tf.data.Dataset.from_tensor_slices((x, y))
+    train_dataset = train_dataset.shuffle(10).batch(args.batch_size).prefetch(AUTOTUNE).cache()
 
     # End Custom dataset
 
@@ -68,8 +68,8 @@ if __name__ == "__main__":
 
         model.add(Dense(args.mlp_dim, activation=tfa.activations.gelu))
         model.add(Dropout(0.1))
-        model.add(Dense((args.image_size**2)*3))
-        model.add(tf.keras.layers.Reshape((args.image_size, args.image_size, 3)))
+        model.add(Dense((args.patch_size**2)*3))
+        model.add(tf.keras.layers.Reshape((args.patch_size, args.patch_size, 3)))
         # model.add(Dense(10, activation='softmax'))
 
         model.compile(
@@ -84,6 +84,7 @@ if __name__ == "__main__":
             #metrics=["accuracy"],
         )
 
+
     history = model.fit(
         train_dataset,
         #validation_data=ds_val,
@@ -91,12 +92,16 @@ if __name__ == "__main__":
         callbacks=[TensorBoard(log_dir=args.logdir, profile_batch=0), ],
     )
 
-    test = model.predict(images)
-
+    test = model.predict(x)
 
 
     loss = history.history['loss']
     plt.plot(loss, label='Training loss')
+    plt.show()
+
+    plt.imshow(test[0, :, :, 0])
+    plt.show()
+    plt.imshow(y[0, :, :, 0])
     plt.show()
 
     model.save_weights(os.path.join(args.logdir, "vit"))
